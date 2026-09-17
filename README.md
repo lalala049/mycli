@@ -37,6 +37,13 @@ cmake --build --preset default
 cmake --build --preset default --target clean
 ```
 
+## clangd / 编辑器（消除 stdio.h not found）
+
+- CMake 每次构建会把 `compile_commands.json` 复制到项目根（`ccd` 目标），clangd 从 cwd 向上找得到。
+- `.clangd` 把编译驱动指定为 `gcc` 并指向 `build/default` 的编译数据库。
+- nvim 侧已配 `--query-driver=.../scoop/apps/mingw/**`，授权 clangd 执行 gcc 提取 MinGW 头文件路径。
+- 三者缺一不可：缺编译数据库或 `.clangd` 时，clangd 找不到 MinGW 的 `stdio.h`（gcc 编译本身不受影响）。
+
 ## 用 overseer.nvim 跑任务
 
 在项目里任意位置按 `<leader>R` 选任务、`<leader>O` 开任务面板，或 `:OverseerRun`：

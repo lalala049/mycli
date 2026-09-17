@@ -4,7 +4,9 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
-compile_commands.json
+
+# clangd 用的编译数据库副本（由 ccd 目标从 build/ 复制，不入库）
+/compile_commands.json
 
 # vcpkg（manifest 模式装在 build 目录内，无需提交）
 vcpkg_installed/

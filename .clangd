@@ -1,0 +1,6 @@
+# clangd 配置：配合 nvim 的 --query-driver 使用
+# - Compiler: 编译驱动指定为 gcc，clangd 才会按 gcc 的方式解析参数
+# - CompilationDatabase: 编译数据库位置（相对本文件所在目录）
+CompileFlags:
+  Compiler: gcc
+  CompilationDatabase: build/default
