@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake: Configure",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--preset", "default"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "detail": "按 CMakePresets.json 配置：安装 vcpkg 依赖并生成 build/default"
+    },
+    {
+      "label": "Build myCLI",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "--preset", "default"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": "CMake: Configure",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "detail": "编译 myCLI（Debug），编译错误会进入 quickfix"
+    },
+    {
+      "label": "Run myCLI",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/default/myCLI.exe",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": "Build myCLI",
+      "problemMatcher": [],
+      "detail": "运行编译好的 myCLI"
+    },
+    {
+      "label": "Clean myCLI",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "--preset", "default", "--target", "clean"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "clean",
+      "problemMatcher": [],
+      "detail": "清理 build/default 下的构建产物"
+    }
+  ]
+}
