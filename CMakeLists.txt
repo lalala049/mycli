@@ -13,8 +13,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # CMAKE_TOOLCHAIN_FILE 指向 vcpkg 工具链，configure 时自动安装依赖。
 # 新增依赖：编辑 vcpkg.json 的 dependencies 后重新 configure 即可。
 
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
 add_executable(myCLI
   src/main.c
+  src/cli.c
 )
 
 target_compile_definitions(myCLI PRIVATE
