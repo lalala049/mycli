@@ -24,6 +24,40 @@ static char* str_clone(const char*src){
     return buf;
 }
 
+static void wrong_command(const char* cmd_wrong){
+    //TODO:我这里需要最小操作次数修改字符串算法，找出最适配的几个，做出提示
+    printf("wrong command");
+}
+
+static int find_cmd(const char* cmd_name){
+    for(int i = 0;i < cmdCount;i++){
+        if(strcmp(opts[i].cmd,cmd_name) == 0){
+            return i;
+        }
+    }
+
+    wrong_command(cmd_name);
+    return -1;
+}
+
+static CliArg* parse_argv_to_cliargs(int argc,char** argv){
+    CliArg args[argc];
+    for(int i = 0;i<argc;i++){
+        if(strlen(argv[i]) >= 2 && argv[0] == '-' && argv[1] == '-'){
+            argc
+        }
+    }
+}
+
+void cli_command_help(const char* cmd_name){
+    int cmd_index = find_cmd(cmd_name);
+    if(cmd_index == -1){
+        return;
+    }
+
+    printf("%s的帮助文档\n%s",cmd_name,opts[cmd_index].help);
+}
+
 void cli_register_command(const char* cmd_name,const char* help,CliCommandHandler handler){
     Operation* opt = &opts[cmdCount];
 
@@ -34,13 +68,16 @@ void cli_register_command(const char* cmd_name,const char* help,CliCommandHandle
 
 int cli_run(int argc, char **argv)
 {
-    int i=1;
-    if(strcmp(argv[1],opts[0].cmd) == 0){
-        CliArgs args;
-        args.operated = argv[2];
-        i = opts[0].handler(args);
+    //TODO:比较命令，选出执行的，取出参数，传递给处理器
+    if(argc <= 0){
+        return -1;
     }
+    int cmd_index = find_cmd(argv[0]);
+    if(cmd_index == -1){
+        return -1;
+    }
+    CliArg* args = parse_argv_to_cliargs(argc-1,argv+1);
 
-    printf("你运行了%s，运行是否成功：%i\n",opts[0].cmd,i);
+
     return 0;
 }
