@@ -16,8 +16,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_executable(myCLI
-  src/main.c
+  tests/main.c
   src/cli.c
+  src/util/map.c
 )
 
 target_compile_definitions(myCLI PRIVATE

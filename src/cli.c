@@ -1,11 +1,11 @@
 #include "cli.h"
+#include "map.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 typedef struct Operation{
     char* cmd;
-    CliArg* args;
     CliCommandHandler handler;
     char* help;
 }Operation;
@@ -24,9 +24,43 @@ static char* str_clone(const char*src){
     return buf;
 }
 
+static int min(int a,int b){
+    return a > b ? b : a;
+}
+
+static int levenshtein(const char* s1,const char* s2){
+
+    int n = strlen(s1),m = strlen(s2);
+    int dp[n+1][m+1];
+    for(int i = 0;i <= n;i++) dp[i][0] = i;
+    for(int j = 0;j <= m;j++) dp[0][j] = j;
+
+    for(int i = 1;i <= n;i++){
+        for(int j = 1;j <= m;j++){
+            if(s1[i-1] == s2[j-1]){
+                dp[i][j] = dp[i-1][j-1];
+            }else{
+                dp[i][j] = 1 + min(dp[i-1][j],min(dp[i-1][j-1],dp[i][j-1]));
+            }
+        }
+    }
+
+    return dp[n][m];
+}
+
 static void wrong_command(const char* cmd_wrong){
-    //TODO:我这里需要最小操作次数修改字符串算法，找出最适配的几个，做出提示
-    printf("wrong command%s",cmd_wrong);
+    int min = 10000;
+    int res = -1;
+
+    for(int i = 0;i < cmdCount;i++){
+        int chenge = levenshtein(cmd_wrong,opts[i].cmd);
+        if(chenge < min){
+            min = chenge;
+            res = i;
+        }
+    }
+    printf("错误的命令:%s\n你想输入的命令可能是:",cmd_wrong);
+    if(res != -1) printf("%s\n",opts[res].cmd);
 }
 
 static int find_cmd(const char* cmd_name){
@@ -40,20 +74,27 @@ static int find_cmd(const char* cmd_name){
     return -1;
 }
 
-static CliArg* parse_argv_to_cliargs(int argc,char** argv){
-    CliArg* args = malloc(sizeof(CliArg) * argc);
-    if(!args) return NULL;
+static char** parse_argv_to_cliargs(int* argc,char** argv){
+    int argc_int = (*argc) - 1;
+    char** args = malloc(*argc*sizeof(char*));
+    int args_count = 0;
 
-    for(int i = 0;i<argc;i++){
+    for(int i = 0;i < argc_int; i++){
         if(strlen(argv[i]) >= 2 && argv[i][0] == '-'){
-            args[i].type = CLI_FLAG;
-            args[i].flag = argv[i] + 1;
+            map_put(argv[i]+1,1);
         }else{
-            args[i].pos = argv[i];
+            args[args_count] = argv[i];
+            args_count++;
         }
     }
 
+    *argc = args_count;
+
     return args;
+}
+
+int cli_flag_exist(char* flag){
+    return map_get(flag);
 }
 
 void cli_command_help(const char* cmd_name){
@@ -62,7 +103,7 @@ void cli_command_help(const char* cmd_name){
         return;
     }
 
-    printf("%s的帮助文档\n%s",cmd_name,opts[cmd_index].help);
+    printf("%s的帮助文档\n%s\n",cmd_name,opts[cmd_index].help);
 }
 
 void cli_register_command(const char* cmd_name,const char* help,CliCommandHandler handler){
@@ -76,7 +117,6 @@ void cli_register_command(const char* cmd_name,const char* help,CliCommandHandle
 
 int cli_run(int argc, char **argv)
 {
-    //TODO:比较命令，选出执行的，取出参数，传递给处理器
     if(argc <= 0){
         return -1;
     }
@@ -85,8 +125,8 @@ int cli_run(int argc, char **argv)
         return -1;
     }
 
-    CliArg* args = parse_argv_to_cliargs(argc-1,argv+1);
-    opts[cmd_index].handler(argc-1,args);
+    char** args = parse_argv_to_cliargs(&argc,argv+1);
+    opts[cmd_index].handler(argc,args);
 
     return 0;
 }
